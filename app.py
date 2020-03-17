@@ -230,6 +230,24 @@ def gamePreview(game):
     return rows
 """
 
+# def insert_stat(points, rebounds, assists):
+#     cursor.execute(
+#         '''
+#         INSERT INTO "StatInfo"(Type)
+#         VALUES (points);
+#         FROM "Player"
+#              INNER JOIN "Team" ON ( "Player".TeamId = "Team".Id )
+#             INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
+#             INNER JOIN "Game" ON ( ("Team".Id = "Game".HomeTeamId AND "StatInfo".GameId = "Game".Id) 
+# 						   OR  ("Team".Id = "Game".AwayTeamId AND "StatInfo".GameId = "Game".Id) )
+#         WHERE "StatInfo".Type = 'Pts' AND "Game".Id = %s
+#         GROUP BY "Team".Id;
+#         ''', (ga[4:]))
+#     rows = cursor.fetchall()
+#     return rows
+
+
+
 db = connectToDB()
 cursor = db.cursor()
 #createTables(cursor)
@@ -271,10 +289,38 @@ def update_game():
 
 @app.route('/insert_player', methods=['GET', 'POST'])
 def insert_player():
+    if request.method == 'POST':
+
+        firstname = request.form['firstname']
+        print(firstname)
+        lastname = request.form['lastname']
+        print(lastname)
+        height = request.form['height']
+        weight = request.form['weight']
+        age = request.form['age']
+        teamID = request.form['teamid']
+       
+        cursor.execute('''
+        INSERT INTO "Player"(FirstName, LastName, Height, Weight, Age, TeamID) 
+        VALUES (%s, %s, %s, %s, %s, %s)
+        ''', (firstname, lastname, height, weight, age, teamID))
+        db.commit()
     return render_template("insert_player.html", title='Insert Player')
 
-@app.route('/insert_stat')
+@app.route('/insert_stat', methods=['GET','POST'])
 def insert_stat():
+    if request.method == 'POST':
+        points = request.form['points']
+        print(points)
+        rebounds = request.form['rebounds']
+        print(rebounds)
+        assists = request.form['assists']
+        print(assists)
+        cursor.execute('''
+        INSERT INTO "StatInfo"(Type) 
+        VALUES (%s, %s, %s)
+        ''', (points, rebounds, assists))
+        db.commit()
     return render_template("insert_stat.html", title='Insert Stat')
 
 if __name__ == "__main__":

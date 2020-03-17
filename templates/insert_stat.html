@@ -1,4 +1,26 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h1>Insert Stats</h1>
+<h1>Insert Stats</h1>
+
+<form action="/insert_stat" method="POST">
+    <div class="form-group">
+        <label>Points:</label>
+        <input style="width: 100px" type="number" class="form-control" name="points" required="1">
+    </div>
+
+    <div class="form-group">
+        <label>Rebounds:</label>
+        <input style="width: 100px" type="number" class="form-control" name="rebounds" required="1">
+    </div>
+
+    <div class="form-group">
+        <label>Assists:</label>
+        <input style="width: 100px" type="number" class="form-control" name="assists" required="1">
+    </div>
+
+    <div class="form-group">
+        <button class="btn btn-primary" type="submit">Insert Stats</button>
+    </div>
+</form>
+
 {% endblock content %}

@@ -1,90 +1,42 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Insert Players</h1>
+<h1>Insert Player</h1>
 
-<p>Please fill the form.</p>
-<table border=1 width="300">
+<form action="/insert_player" method="POST">
 
-<tr style="text-align:center;">
+    <div class="form-group">
+        <label>First Name</label>
+        <input style="width: 100px" type="text" class="form-control" name="firstname" required="1">
+    </div>
 
-<td colspan="2">Insert Player</td>
-</tr>
+    <div class="form-group">
+        <label>Last Name</label>
+        <input style="width: 100px" type="text" class="form-control" name="lastname" required="1">
+    </div>
 
-<tr>
+    <div class="form-group">
+        <label>Height(ft)</label>
+        <input style="width: 100px" type="text" class="form-control" name="height" required="1">
+    </div>
 
-<td>Player ID</td>
+    <div class="form-group">
+        <label>Weight(lb)</label>
+        <input style="width: 100px" type="text" class="form-control" name="weight" required="1">
+    </div>
 
-<td>
+    <div class="form-group">
+        <label>Age</label>
+        <input style="width: 100px" type="text" class="form-control" name="age" required="1">
+    </div>
 
-<input type="INT" PlayerID="PlayerID">
+    <div class="form-group">
+        <label>Team ID</label>
+        <input style="width: 100px" type="text" class="form-control" name="teamid" required="1">
+    </div>
 
-</td>
-
-</tr>
-
-<tr>
-
-<td>First Name</td>
-
-<td>
-
-<input type="Varchar" FirstName="FirstName">
-
-</td>
-
-</tr>
-
-<td>Last Name</td>
-
-<td>
-
-<input type="Varchar" LastName="LastName">
-
-</td>
-
-</tr>
-
-<td>Height(ft)</td>
-
-<td>
-
-<input type="Varchar" Height="Height">
-
-</td>
-
-</tr>
-<td>Weight(lb)</td>
-
-<td>
-
-<input type="INT" Weight="Weight">
-
-</td>
-
-</tr>
-<td>Age</td>
-
-<td>
-
-<input type="INT" Age="Age">
-
-</td>
-
-</tr>
-<td>Team ID</td>
-
-<td>
-
-<input type="INT" TeamID="TeamID">
-
-</td>
-
-</tr>
-
-</table>
-<input type="submit" value="Submit" />
-<input type="reset" value="Reset" />
-			
-
+    <div class="form-group">
+        <button class="btn btn-primary" type="submit">Insert Player</button>
+    </div>
+</form>
 
 {% endblock content %}
