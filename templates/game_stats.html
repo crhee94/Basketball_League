@@ -1,9 +1,8 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Game Page</h1>
+<h1>Game Stat Page</h1>
 
-<p>You can view the stats of players in the two teams in a game. Choose a game.</p>
-<h3>Game</h3>
+<h4>Please choose a game in the drop-down menu to see the game and individual player stats.</h4>
 <form action="/game_stats" method="POST">
     <select name="game">
         <option value="">Select Game</option>
@@ -17,12 +16,20 @@
 
     <button>View</button>
 </form>
-
-{% for result in gameResult %}
-    <p>{{result}}</p>
+{% if gameInfo != null %} 
+{% for info in gameInfo %}
+<p>{{info}}</p>
 {% endfor %}
- 
+{% endif %}
 
+
+{% if gameResult != null %}
+
+<!--
+{% for result in gameResult %}
+    <p>Home Team: {{result[0]}}</p>
+{% endfor %}
+-->
 <h2>Home Team</h2>
 <table style="width:100%">
     <tr>
@@ -61,4 +68,5 @@
     </tr>
     {% endfor %} 
 </table>
+{% endif %}
 {% endblock content %}

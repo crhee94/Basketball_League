@@ -1,31 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 <h1>Home Page</h1>
-    {% for team in standing %}
-    <li>{{team}}</li>
-    {% endfor %}
-<!--
-<ol>
-    <p>You can view the stats of players in the two teams in a game. Choose a game.</p>
-    <h3>Game</h3>
-    <form action="/submit" method="POST">
-        <select name="game">
-            <option value="">Select Game</option>
-            <option value="game1">Game 1</option>
-            <option value="game2">Game 2</option>
-            <option value="game3">Game 3</option>
-            <option value="game4">Game 4</option>
-            <option value="game5">Game 5</option>
-            <option value="game6">Game 6</option>
-        </select>
-
-        <button>View</button>
-    </form>
-
-    {% for team in Teams %}
-    <li>{{team}}</li>
-    {% endfor %}
-</ol>
--->
+<h3>Welcome to the Hoops4U league. This is a new league that has formed while the NBA is shutdown 
+    due to the Covid-19 virus. It's a 4 team league and we got some ballers.</h3>
 
 {% endblock content %}

@@ -28,7 +28,7 @@ def createTables(cursor):
                     ID           SERIAL NOT NULL,
                     FirstName    VARCHAR(30) NOT NULL,
                     LastName     VARCHAR(30) NOT NULL,
-                    Height       VARCHAR(5),
+                    Height       VARCHAR(6),
                     Weight       INT,
                     Age          INT,
                     TeamId       INT NOT NULL,
@@ -126,7 +126,7 @@ def queryHomeTeam(game):
                  INNER JOIN "Team" ON ( "Player".TeamId = "Team".Id )
 	             INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
                  INNER JOIN "Game" ON ( "Team".Id = "Game".HomeTeamId AND "StatInfo".GameId = "Game".Id )
-            WHERE "StatInfo".Type = 'Pts'
+            WHERE "StatInfo".Type = 'Pts' AND GameId = %(int)s
             ) AS "A"
             INNER JOIN (
                 SELECT "Player".Id AS PlayerId, "Game".Id AS GameID, FirstName, LastName, "Team".TeamName AS TeamName, StatValue AS Rebound
@@ -134,7 +134,7 @@ def queryHomeTeam(game):
                      INNER JOIN "Team" ON ( "Player".TeamId = "Team".Id )
 	                 INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
 	                 INNER JOIN "Game" ON ( "Team".Id = "Game".HomeTeamId AND "StatInfo".GameId = "Game".Id )
-                WHERE "StatInfo".Type = 'Reb'
+                WHERE "StatInfo".Type = 'Reb' AND GameId = %(int)s
             ) AS "B"
             ON "A".PlayerId = "B".PlayerId
             INNER JOIN (
@@ -143,11 +143,10 @@ def queryHomeTeam(game):
                      INNER JOIN "Team" ON ( "Player".TeamId = "Team".Id )
 	                 INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
 	                 INNER JOIN "Game" ON ( "Team".Id = "Game".HomeTeamId AND "StatInfo".GameId = "Game".Id )
-                WHERE "StatInfo".Type = 'Ast'
+                WHERE "StatInfo".Type = 'Ast' AND GameId = %(int)s
             ) AS "C"
-            ON "B".PlayerId = "C".PlayerId
-        WHERE "C".GameId = %s;
-        ''', (game[4:]))
+            ON "B".PlayerId = "C".PlayerId;
+        ''', {'int': game[4:]})
     rows = cursor.fetchall()
     return rows
 
@@ -161,7 +160,7 @@ def queryAwayTeam(game):
                  INNER JOIN "Team" ON ( "Player".TeamId = "Team".Id )
 	             INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
                  INNER JOIN "Game" ON ( "Team".Id = "Game".AwayTeamId AND "StatInfo".GameId = "Game".Id )
-            WHERE "StatInfo".Type = 'Pts'
+            WHERE "StatInfo".Type = 'Pts' AND GameId = %(int)s
             ) AS "A"
             INNER JOIN (
                 SELECT "Player".Id AS PlayerId, "Game".Id AS GameID, FirstName, LastName, "Team".TeamName AS TeamName, StatValue AS Rebound
@@ -169,7 +168,7 @@ def queryAwayTeam(game):
                      INNER JOIN "Team" ON ( "Player".TeamId = "Team".Id )
 	                 INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
 	                 INNER JOIN "Game" ON ( "Team".Id = "Game".AwayTeamId AND "StatInfo".GameId = "Game".Id )
-                WHERE "StatInfo".Type = 'Reb'
+                WHERE "StatInfo".Type = 'Reb' AND GameId = %(int)s
             ) AS "B"
             ON "A".PlayerId = "B".PlayerId
             INNER JOIN (
@@ -178,11 +177,10 @@ def queryAwayTeam(game):
                      INNER JOIN "Team" ON ( "Player".TeamId = "Team".Id )
 	                 INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
 	                 INNER JOIN "Game" ON ( "Team".Id = "Game".AwayTeamId AND "StatInfo".GameId = "Game".Id )
-                WHERE "StatInfo".Type = 'Ast'
+                WHERE "StatInfo".Type = 'Ast' AND GameId = %(int)s
             ) AS "C"
-            ON "B".PlayerId = "C".PlayerId
-        WHERE "C".GameId = %s;
-        ''', (game[4:]))
+            ON "B".PlayerId = "C".PlayerId;
+        ''', {'int': game[4:]})
     rows = cursor.fetchall()
     return rows
 
@@ -214,21 +212,21 @@ def showStandings():
     )
     standing = cursor.fetchall()
     return standing
+"""
 
 # IF THE GAME HAS NOT BEEN PLAYED YET AND USER SEARCHES THE GAME, SHOW GAME TIME, HOME TEAM, AWAY TEAM
 def gamePreview(game):
     cursor.execute(
         '''
-        SELECT TeamName, GameDate
+        SELECT "Game".Id, "HomeTeam".TeamName AS HomeTeam, "AwayTeam".TeamName AS AwayTeam, "Game".GameDate
         FROM "Game"
-             INNER JOIN "Team" ON ( "Game".HomeTeamID = "Team".ID )
-             INNER JOIN "Team" ON ( "Game".AwayTeamID = "Team".ID )
-        WHERE "Game".Id = %s;
+             LEFT JOIN "Team" AS "HomeTeam" ON ( "Game".HomeTeamId = "HomeTeam".Id )
+             LEFT JOIN "Team" AS "AwayTeam" ON ( "Game".AwayTeamId = "AwayTeam".Id )
+             WHERE "Game".Id = 4;
         ''', (game[4:]))
-    
+
     rows = cursor.fetchall()
     return rows
-"""
 
 # def insert_stat(points, rebounds, assists):
 #     cursor.execute(
@@ -296,14 +294,18 @@ def insert_player():
         lastname = request.form['lastname']
         print(lastname)
         height = request.form['height']
+        print(height)
         weight = request.form['weight']
+        print(weight)
         age = request.form['age']
-        teamID = request.form['teamid']
+        print(age)
+        teamname = request.form['teamname']
+        print(teamname)
        
         cursor.execute('''
-        INSERT INTO "Player"(FirstName, LastName, Height, Weight, Age, TeamID) 
-        VALUES (%s, %s, %s, %s, %s, %s)
-        ''', (firstname, lastname, height, weight, age, teamID))
+        INSERT INTO "Player"(Id, FirstName, LastName, Height, Weight, Age, TeamID) 
+        VALUES (DEFAULT, %s, %s, %s, %s, %s, (SELECT Id FROM "Team" WHERE TeamName = %s));
+        ''', (firstname, lastname, height, weight, age, teamname))
         db.commit()
     return render_template("insert_player.html", title='Insert Player')
 
