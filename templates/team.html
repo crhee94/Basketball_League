@@ -1,4 +1,37 @@
 {% extends "layout.html" %}
 {% block content %}
     <h1>Team Page</h1>
+    <h4>Choose a team in the drop-down menu to see the players on the team.</h4>
+    <form action="/team" method="POST">
+
+        <select name="team">
+            <option value="">Select Team</option>
+            <option value="team1">{{teams[0]}}</option>
+            <option value="team2">{{teams[1]}}</option>
+            <option value="team3">{{teams[2]}}</option>
+            <option value="team4">{{teams[3]}}</option>
+        </select>
+
+        <button>View</button>
+
+        {% if teamInfo != null %}
+            <h2>Team</h2>
+            <table style="width:100%">
+                <tr>
+                  <th>First Name</th>
+                  <th>Last Name</th>
+                  <th>Age</th>
+                  <th>Height</th>
+                  <th>Weight</th>
+                </tr>
+                {% for team in teamInfo %}
+                <tr>
+                    {% for player in team %}
+                    <td>{{player}}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}  
+            </table>
+        {% endif %}
+    </form>
 {% endblock content %}

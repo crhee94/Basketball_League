@@ -184,6 +184,19 @@ def queryAwayTeam(game):
     rows = cursor.fetchall()
     return rows
 
+def showSchedule():
+    cursor.execute(
+        '''
+        SELECT "Game".Id, "HomeTeam".TeamName AS HomeTeam, "AwayTeam".TeamName AS AwayTeam, "Game".GameDate
+        FROM "Game"
+             LEFT JOIN "Team" AS "HomeTeam" ON ( "Game".HomeTeamId = "HomeTeam".Id )
+             LEFT JOIN "Team" AS "AwayTeam" ON ( "Game".AwayTeamId = "AwayTeam".Id )
+        ORDER BY GameDate;
+        ''')
+    schedules = cursor.fetchall()
+    print(schedules)
+    return schedules
+
 def queryGameResult(game):
     cursor.execute(
         '''
@@ -213,6 +226,28 @@ def showStandings():
     standing = cursor.fetchall()
     return standing
 """
+
+def showTeamList():
+    cursor.execute(
+        '''
+        SELECT "Team".TeamName
+        FROM "Team";
+        '''
+    )
+    teams = cursor.fetchall()
+    return teams
+
+def showTeamInfo(team):
+    cursor.execute(
+        '''
+        SELECT FirstName, LastName, Age, Height, Weight
+        FROM "Player"
+             INNER JOIN "Team" ON ( "Player".TeamId = "Team".Id )
+        WHERE "Team".Id = %s;
+        ''', (team[4:]))
+    teams = cursor.fetchall()
+    return teams
+
 
 # IF THE GAME HAS NOT BEEN PLAYED YET AND USER SEARCHES THE GAME, SHOW GAME TIME, HOME TEAM, AWAY TEAM
 def gamePreview(game):
@@ -253,8 +288,19 @@ cursor = db.cursor()
 @app.route('/')
 @app.route('/home')
 def home():
-    #standing = showStandings()
-    return render_template("home.html", title='Home')
+    schedule = showSchedule()
+    return render_template("home.html", title='Home', schedules=schedule)
+
+@app.route('/team', methods=['GET', 'POST'])
+def team():
+    if request.method == "POST":
+        team = request.form['team']
+        teams = showTeamList()
+        print(team)
+        teamInfo = showTeamInfo(team)
+        return render_template("team.html", title='Team', teams=teams, teamInfo=teamInfo)
+    teams = showTeamList()
+    return render_template("team.html", title='Team', teams=teams)
 
 @app.route('/player_stats')
 def player():
@@ -279,6 +325,7 @@ def game():
 
 @app.route('/standing')
 def standing():
+    #standing = showStandings()
     return render_template("standing.html", title="Standing")
 
 @app.route('/update_game')

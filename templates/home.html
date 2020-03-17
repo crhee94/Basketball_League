@@ -1,7 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
-<h1>Home Page</h1>
-<h3>Welcome to the Hoops4U league. This is a new league that has formed while the NBA is shutdown 
-    due to the Covid-19 virus. It's a 4 team league and we got some ballers.</h3>
+<h1>Hoops4U</h1>
+<h4>NOTICE: League is currently suspended due to the COVID-19 virus. Thank you for your patience.</h4><br/>
+
+{% for schedule in schedules %}
+<h5>Game: {{schedule[0]}} - {{schedule[3]}}</h5>
+<p>Home Team: {{schedule[1]}} - Away Team: {{schedule[2]}}</p>
+{% endfor %}
 
 {% endblock content %}
