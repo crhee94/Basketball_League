@@ -335,11 +335,11 @@ def game():
             return render_template("game_stats.html", title='Game', gameInfo = gameInfo)
     return render_template("game_stats.html", title='Game')
 
-@app.route('/standing')
+@app.route('/standings')
 def standing():
     standing = showStandings()
     print(standing)
-    return render_template("standing.html", title="Standing", standings=standing)
+    return render_template("standings.html", title="Standings", standings=standing)
 
 @app.route('/update_game')
 def update_game():
