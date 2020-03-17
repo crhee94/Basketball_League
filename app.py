@@ -212,20 +212,32 @@ def queryGameResult(game):
     rows = cursor.fetchall()
     return rows
 
-"""
-# NEED TO WORK ON STANDINGS
 def showStandings():
     cursor.execute(
         '''
-        SELECT TeamName, COUNT(WinnerID), COUNT(LoserID)
-        FROM "Game"
-             INNER JOIN "Team" ON ( "Game".HomeTeamID = "Team".ID AND "Game".AwayTeamID = "Team".ID )
-        GROUP BY TeamName;
+        SELECT "Team".TeamName, Wins, Losses
+        FROM "Team" 
+             INNER JOIN (
+                 SELECT "W".TeamName AS Winner, "L".TeamName AS Loser, Wins, Losses
+                 FROM (
+                     SELECT "Team".TeamName, COUNT("Game".WinnerId) AS Wins
+                     FROM "Game"
+                          RIGHT JOIN "Team" ON ( "Game".WinnerId = "Team".Id )
+                     GROUP BY TeamName
+                     ) AS "W"
+                     INNER JOIN(
+                         SELECT "Team".TeamName, COUNT("Game".LoserId) AS Losses
+                         FROM "Game"
+                              RIGHT JOIN "Team" ON ( "Game".LoserId = "Team".Id )
+                         GROUP BY TeamName
+                     ) AS "L" ON "W".TeamName = "L".TeamName
+             ) AS "Final" ON ("Team".TeamName = "Final".Winner AND "Team".TeamName = "Final".Loser)
+        ORDER BY WINS DESC;
         '''
     )
     standing = cursor.fetchall()
     return standing
-"""
+
 
 def showTeamList():
     cursor.execute(
@@ -325,8 +337,9 @@ def game():
 
 @app.route('/standing')
 def standing():
-    #standing = showStandings()
-    return render_template("standing.html", title="Standing")
+    standing = showStandings()
+    print(standing)
+    return render_template("standing.html", title="Standing", standings=standing)
 
 @app.route('/update_game')
 def update_game():
