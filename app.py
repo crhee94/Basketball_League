@@ -386,21 +386,29 @@ def queryPlayerStat(firstname, lastname, teamname):
 
     return rows
 
-# def insert_stat(points, rebounds, assists):
-#     cursor.execute(
-#         '''
-#         INSERT INTO "StatInfo"(Type)
-#         VALUES (points);
-#         FROM "Player"
-#              INNER JOIN "Team" ON ( "Player".TeamId = "Team".Id )
-#             INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
-#             INNER JOIN "Game" ON ( ("Team".Id = "Game".HomeTeamId AND "StatInfo".GameId = "Game".Id) 
-# 						   OR  ("Team".Id = "Game".AwayTeamId AND "StatInfo".GameId = "Game".Id) )
-#         WHERE "StatInfo".Type = 'Pts' AND "Game".Id = %s
-#         GROUP BY "Team".Id;
-#         ''', (ga[4:]))
-#     rows = cursor.fetchall()
-#     return rows
+def displayTeamsPlayed(game):
+    cursor.execute(
+        '''
+        SELECT TeamName
+        FROM "Team"
+             INNER JOIN "Game" ON ( "Team".Id = "Game".HomeTeamId OR "Team".Id = "Game".AwayTeamId )
+        WHERE "Game".Id = %s;
+        ''', (game[4:]))
+    teams = cursor.fetchall()
+    return teams
+
+def updateGameResult(winner, loser, game):
+    print(winner)
+    print(loser)
+    print(game)
+    cursor.execute(
+        '''
+        UPDATE "Game"
+        SET WinnerId = (SELECT "Team".Id FROM "Team" WHERE TeamName ILIKE %s),
+            LoserId = (SELECT "Team".Id FROM "Team" WHERE TeamName ILIKE %s)
+        WHERE "Game".Id = %s;
+        ''', (winner, loser, game[4:]))
+    db.commit()
 
 db = connectToDB()
 cursor = db.cursor()
@@ -496,8 +504,15 @@ def standing():
     print(standing)
     return render_template("standings.html", title="Standings", standings=standing)
 
-@app.route('/update_game')
+@app.route('/update_game', methods=['GET', 'POST'])
 def update_game():
+    if request.method == "POST":
+        game = request.form['game']
+        teams = displayTeamsPlayed(game)
+        winner = request.form['winner']
+        loser = request.form['loser']
+        updateGameResult(winner, loser, game)
+        return render_template("update_game.html", title="Update Game", winner=winner, loser=loser, game=game)
     return render_template("update_game.html", title="Update Game")
 
 @app.route('/insert_player', methods=['GET', 'POST'])
