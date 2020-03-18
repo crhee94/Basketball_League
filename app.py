@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 def connectToDB():
     try:
-        return psycopg2.connect(host = "localhost", port = "5432", database = "test")
+        return psycopg2.connect( host = "localhost", port = "5432", database = "test")
     except (Exception, psycopg2.Error) as error:
         print("Can't connect to database")
         print(error)
