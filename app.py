@@ -413,8 +413,23 @@ def team():
     teams = showTeamList()
     return render_template("team.html", title='Team', teams=teams)
 
-@app.route('/player_stats')
+@app.route('/player_stats', methods=['GET', 'POST'])
 def player():
+    if request.method == 'POST':
+        firstname = request.form['firstname']
+        print(firstname)
+        lastname = request.form['lastname']
+        print(lastname)
+        teamname = request.form['teamname']
+        print(teamname)
+
+        playerStat = queryPlayerStat(firstname, lastname, teamname)
+        print(playerStat)
+        if firstname and lastname and teamname is not None:
+            return render_template("player_stats.html", title='Player', playerStat = playerStat, 
+                    firstname = firstname, lastname = lastname, teamname = teamname)
+        #else()
+
     return render_template("player_stats.html", title='Player')
 
 @app.route('/game_stats', methods=['GET', 'POST'])
