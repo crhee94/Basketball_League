@@ -23,13 +23,10 @@
 {% endif %}
 
 
-{% if gameResult != null %}
+{% if totalPoints != null and totalRebounds != null and totalAssists != null %}
+<h2>{{totalPoints[0][0]}} - Points: {{totalPoints[0][1]}} - Rebounds: {{totalRebounds[0][1]}} - Assists: {{totalAssists[0][1]}}</h2>
+<h2>{{totalPoints[1][0]}} - Points: {{totalPoints[1][1]}} - Rebounds: {{totalRebounds[1][1]}} - Assists: {{totalAssists[1][1]}}</h2>
 
-<!--
-{% for result in gameResult %}
-    <p>Home Team: {{result[0]}}</p>
-{% endfor %}
--->
 <h2>Home Team</h2>
 <table class="customers" style="width:100%">
     <tr>

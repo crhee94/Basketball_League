@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 def connectToDB():
     try:
-        return psycopg2.connect( host = "localhost", port = "5432", database = "test")
+        return psycopg2.connect(host = "localhost", port = "5432", database = "test")
     except (Exception, psycopg2.Error) as error:
         print("Can't connect to database")
         print(error)
@@ -198,16 +198,46 @@ def showSchedule():
     print(schedules)
     return schedules
 
-def queryGameResult(game):
+def queryTotalPoints(game):
     cursor.execute(
         '''
         SELECT "Team".TeamName AS TeamName, SUM(StatValue) AS Points
         FROM "Player"
              INNER JOIN "Team" ON ( "Player".TeamId = "Team".Id )
-            INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
-            INNER JOIN "Game" ON ( ("Team".Id = "Game".HomeTeamId AND "StatInfo".GameId = "Game".Id) 
+             INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
+             INNER JOIN "Game" ON ( ("Team".Id = "Game".HomeTeamId AND "StatInfo".GameId = "Game".Id) 
 						   OR  ("Team".Id = "Game".AwayTeamId AND "StatInfo".GameId = "Game".Id) )
         WHERE "StatInfo".Type = 'Pts' AND "Game".Id = %s
+        GROUP BY "Team".Id;
+        ''', (game[4:]))
+    rows = cursor.fetchall()
+    return rows
+
+def queryTotalRebounds(game):
+    cursor.execute(
+        '''
+        SELECT "Team".TeamName AS TeamName, SUM(StatValue) AS Rebound
+        FROM "Player"
+             INNER JOIN "Team" ON ( "Player".TeamId = "Team".Id )
+             INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
+             INNER JOIN "Game" ON ( ("Team".Id = "Game".HomeTeamId AND "StatInfo".GameId = "Game".Id) 
+							OR  ("Team".Id = "Game".AwayTeamId AND "StatInfo".GameId = "Game".Id) )
+        WHERE "StatInfo".Type = 'Reb' AND "Game".Id = 1
+        GROUP BY "Team".Id;
+        ''', (game[4:]))
+    rows = cursor.fetchall()
+    return rows
+
+def queryTotalAssists(game):
+    cursor.execute(
+        '''
+        SELECT "Team".TeamName AS TeamName, SUM(StatValue) AS Rebound
+        FROM "Player"
+             INNER JOIN "Team" ON ( "Player".TeamId = "Team".Id )
+             INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
+             INNER JOIN "Game" ON ( ("Team".Id = "Game".HomeTeamId AND "StatInfo".GameId = "Game".Id) 
+							OR  ("Team".Id = "Game".AwayTeamId AND "StatInfo".GameId = "Game".Id) )
+        WHERE "StatInfo".Type = 'Ast' AND "Game".Id = 1
         GROUP BY "Team".Id;
         ''', (game[4:]))
     rows = cursor.fetchall()
@@ -238,7 +268,6 @@ def showStandings():
     )
     standing = cursor.fetchall()
     return standing
-
 
 def showTeamList():
     cursor.execute(
@@ -292,8 +321,6 @@ def gamePreview(game):
 #     rows = cursor.fetchall()
 #     return rows
 
-
-
 db = connectToDB()
 cursor = db.cursor()
 #createTables(cursor)
@@ -338,10 +365,15 @@ def game():
         print(game)
         homeTeam = queryHomeTeam(game)
         awayTeam = queryAwayTeam(game)
-        gameResult = queryGameResult(game)
+        totalPoints = queryTotalPoints(game)
+        totalRebounds = queryTotalRebounds(game)
+        totalAssists = queryTotalAssists(game)
+        print(totalPoints)
+        print(totalRebounds)
+        print(totalAssists)
         if homeTeam and awayTeam is not None:
             return render_template("game_stats.html", title='Game', homeTeam=homeTeam, 
-                   awayTeam=awayTeam, gameResult=gameResult)
+                   awayTeam=awayTeam, totalPoints=totalPoints, totalRebounds=totalRebounds, totalAssists=totalAssists)
         else:
             gameInfo = gamePreview(game)
             print(gameInfo)
