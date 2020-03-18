@@ -350,6 +350,42 @@ def gamePreview(game):
     rows = cursor.fetchall()
     return rows
 
+def queryPlayerStat(firstname, lastname, teamname):
+    cursor.execute(
+        '''
+        SELECT "C".GameDate, "A".Points, "B".Rebound, "C".Assist
+        FROM (
+            SELECT "Player".Id AS PlayerId, "Game".Id AS GameId, FirstName, LastName, "Team".TeamName AS TeamName, StatValue AS Points, "Game".gamedate AS GameDate
+            FROM "Player"
+                 INNER JOIN "Team" ON ( "Player".TeamId = "Team".Id )
+	             INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
+                 INNER JOIN "Game" ON ( "Team".Id = "Game".AwayTeamId AND "StatInfo".GameId = "Game".Id )
+            WHERE "StatInfo".Type = 'Pts'
+            ) AS "A"
+            INNER JOIN (
+                SELECT "Player".Id AS PlayerId, "Game".Id AS GameID, FirstName, LastName, "Team".TeamName AS TeamName, StatValue AS Rebound, "Game".gamedate AS GameDate
+                FROM "Player"
+                     INNER JOIN "Team" ON ( "Player".TeamId = "Team".Id )
+	                 INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
+	                 INNER JOIN "Game" ON ( "Team".Id = "Game".AwayTeamId AND "StatInfo".GameId = "Game".Id )
+                WHERE "StatInfo".Type = 'Reb'
+            ) AS "B"
+            ON "A".PlayerId = "B".PlayerId
+            INNER JOIN (
+                SELECT "Player".Id AS PlayerId, "Game".Id AS GameID, FirstName, LastName, "Team".TeamName AS TeamName, StatValue AS Assist, "Game".gamedate AS GameDate
+                FROM "Player"
+                     INNER JOIN "Team" ON ( "Player".TeamId = "Team".Id )
+	                 INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
+	                 INNER JOIN "Game" ON ( "Team".Id = "Game".AwayTeamId AND "StatInfo".GameId = "Game".Id )
+                WHERE "StatInfo".Type = 'Ast'
+            ) AS "C"
+            ON "B".PlayerId = "C".PlayerId
+        WHERE "C".FirstName = %s and "C".LastName = %s and "C".TeamName = %s;
+        ''', (firstname, lastname, teamname))
+    rows = cursor.fetchall()
+
+    return rows
+
 # def insert_stat(points, rebounds, assists):
 #     cursor.execute(
 #         '''
