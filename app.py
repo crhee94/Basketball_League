@@ -37,6 +37,7 @@ def createTables(cursor):
                     FOREIGN KEY (TeamId) REFERENCES "Team" (Id)
             );'''
         )
+        
         print("Player: Works")
 
         cursor.execute(
@@ -300,6 +301,18 @@ cursor = db.cursor()
 @app.route('/')
 @app.route('/home')
 def home():
+    cursor.execute(
+            '''
+            SELECT pg_get_serial_sequence('"Player"', 'id'); -- returns 'player_id_seq'
+            '''
+    )
+    cursor.execute(
+        '''
+        -- reset the sequence, regardless whether table has rows or not:
+        SELECT setval(pg_get_serial_sequence('"Player"', 'id'), coalesce(max(id) + 1,1), false) FROM "Player";
+        '''
+        )
+    db.commit()
     schedule = showSchedule()
     return render_template("home.html", title='Home', schedules=schedule)
 
@@ -378,10 +391,11 @@ def insert_stat():
         print(rebounds)
         assists = request.form['assists']
         print(assists)
-        cursor.execute('''
-        INSERT INTO "StatInfo"(Type) 
-        VALUES (%s, %s, %s)
-        ''', (points, rebounds, assists))
+        cursor.execute(
+            '''
+            INSERT INTO "StatInfo"(Type) 
+            VALUES (%s, %s, %s)
+            ''', (points, rebounds, assists))
         db.commit()
     return render_template("insert_stat.html", title='Insert Stat')
 
