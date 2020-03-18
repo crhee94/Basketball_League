@@ -339,6 +339,17 @@ def home():
         SELECT setval(pg_get_serial_sequence('"Player"', 'id'), coalesce(max(id) + 1,1), false) FROM "Player";
         '''
         )
+    cursor.execute(
+            '''
+            SELECT pg_get_serial_sequence('"StatInfo"', 'id'); 
+            '''
+    )
+    cursor.execute(
+        '''
+        -- reset the sequence, regardless whether table has rows or not:
+        SELECT setval(pg_get_serial_sequence('"StatInfo"', 'id'), coalesce(max(id) + 1,1), false) FROM "StatInfo";
+        '''
+        )
     db.commit()
     schedule = showSchedule()
     return render_template("home.html", title='Home', schedules=schedule)
@@ -425,9 +436,22 @@ def insert_stat():
         print(assists)
         cursor.execute(
             '''
-            INSERT INTO "StatInfo"(Type) 
-            VALUES (%s, %s, %s)
-            ''', (points, rebounds, assists))
+            INSERT INTO "StatInfo"(PlayerID, GameID, Type, StatValue) 
+            VALUES (%s, %s)
+            ''', ('Pts', points))
+
+        cursor.execute(
+            '''
+            INSERT INTO "StatInfo"(PlayerID, GameID, Type, StatValue) 
+            VALUES (%s, %s)
+            ''', ('Reb', rebounds))
+
+        cursor.execute(
+            '''
+            INSERT INTO "StatInfo"(PlayerID, GameID, Type, StatValue) 
+            VALUES (%s, %s)
+            ''', ('Ast', assists))
+
         db.commit()
     return render_template("insert_stat.html", title='Insert Stat')
 
