@@ -16,13 +16,16 @@
 
         {% if teamInfo != null %}
             <h2>Team</h2>
+            <h4>Points Per Game: {{ppg[0][1]}}</h4>
+            <h4>Rebounds Per Game: {{rpg[0][1]}}</h4>
+            <h4>Assists Per Game: {{apg[0][1]}}</h4>
             <table style="width:100%">
                 <tr>
                   <th>First Name</th>
                   <th>Last Name</th>
                   <th>Age</th>
-                  <th>Height</th>
-                  <th>Weight</th>
+                  <th>Height (feet/inches)</th>
+                  <th>Weight (lbs)</th>
                 </tr>
                 {% for team in teamInfo %}
                 <tr>

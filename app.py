@@ -222,7 +222,7 @@ def queryTotalRebounds(game):
              INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
              INNER JOIN "Game" ON ( ("Team".Id = "Game".HomeTeamId AND "StatInfo".GameId = "Game".Id) 
 							OR  ("Team".Id = "Game".AwayTeamId AND "StatInfo".GameId = "Game".Id) )
-        WHERE "StatInfo".Type = 'Reb' AND "Game".Id = 1
+        WHERE "StatInfo".Type = 'Reb' AND "Game".Id = %s
         GROUP BY "Team".Id;
         ''', (game[4:]))
     rows = cursor.fetchall()
@@ -237,7 +237,7 @@ def queryTotalAssists(game):
              INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
              INNER JOIN "Game" ON ( ("Team".Id = "Game".HomeTeamId AND "StatInfo".GameId = "Game".Id) 
 							OR  ("Team".Id = "Game".AwayTeamId AND "StatInfo".GameId = "Game".Id) )
-        WHERE "StatInfo".Type = 'Ast' AND "Game".Id = 1
+        WHERE "StatInfo".Type = 'Ast' AND "Game".Id = %s
         GROUP BY "Team".Id;
         ''', (game[4:]))
     rows = cursor.fetchall()
@@ -290,6 +290,51 @@ def showTeamInfo(team):
     teams = cursor.fetchall()
     return teams
 
+def showAveragePoints(team):
+    cursor.execute(
+        '''
+        SELECT "Team".TeamName AS TeamName, ROUND((CAST(SUM(StatValue) AS DECIMAL) / 3), 1) AS PPG
+        FROM "Player"
+             INNER JOIN "Team" ON ( "Player".TeamId = "Team".Id )
+             INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
+             INNER JOIN "Game" ON ( ("Team".Id = "Game".HomeTeamId AND "StatInfo".GameId = "Game".Id) 
+							OR  ("Team".Id = "Game".AwayTeamId AND "StatInfo".GameId = "Game".Id) )
+        WHERE "StatInfo".Type = 'Pts' AND "Team".Id = %s
+		GROUP BY "Team".TeamName;
+        ''', (team[4:]))
+    stat = cursor.fetchall()
+    return stat
+
+def showAverageRebounds(team):
+    cursor.execute(
+        '''
+        SELECT "Team".TeamName AS TeamName, ROUND((CAST(SUM(StatValue) AS DECIMAL) / 3), 1) AS RPG
+        FROM "Player"
+             INNER JOIN "Team" ON ( "Player".TeamId = "Team".Id )
+             INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
+             INNER JOIN "Game" ON ( ("Team".Id = "Game".HomeTeamId AND "StatInfo".GameId = "Game".Id) 
+							OR  ("Team".Id = "Game".AwayTeamId AND "StatInfo".GameId = "Game".Id) )
+        WHERE "StatInfo".Type = 'Reb' AND "Team".Id = %s
+		GROUP BY "Team".TeamName;
+        ''', (team[4:]))
+    stat = cursor.fetchall()
+    return stat
+		
+
+def showAverageAssists(team):
+    cursor.execute(
+        '''
+        SELECT "Team".TeamName AS TeamName, ROUND((CAST(SUM(StatValue) AS DECIMAL) / 3), 1) AS APG
+        FROM "Player"
+             INNER JOIN "Team" ON ( "Player".TeamId = "Team".Id )
+             INNER JOIN "StatInfo" ON ( "Player".Id = "StatInfo".PlayerId )
+             INNER JOIN "Game" ON ( ("Team".Id = "Game".HomeTeamId AND "StatInfo".GameId = "Game".Id) 
+							OR  ("Team".Id = "Game".AwayTeamId AND "StatInfo".GameId = "Game".Id) )
+        WHERE "StatInfo".Type = 'Ast' AND "Team".Id = %s
+		GROUP BY "Team".TeamName;
+        ''', (team[4:]))
+    stat = cursor.fetchall()
+    return stat
 
 # IF THE GAME HAS NOT BEEN PLAYED YET AND USER SEARCHES THE GAME, SHOW GAME TIME, HOME TEAM, AWAY TEAM
 def gamePreview(game):
@@ -361,7 +406,10 @@ def team():
         teams = showTeamList()
         print(team)
         teamInfo = showTeamInfo(team)
-        return render_template("team.html", title='Team', teams=teams, teamInfo=teamInfo)
+        ppg = showAveragePoints(team)
+        rpg = showAverageRebounds(team)
+        apg = showAverageAssists(team)
+        return render_template("team.html", title='Team', teams=teams, teamInfo=teamInfo, ppg=ppg, rpg=rpg, apg=apg)
     teams = showTeamList()
     return render_template("team.html", title='Team', teams=teams)
 
