@@ -430,6 +430,7 @@ cursor = db.cursor()
 @app.route('/')
 @app.route('/home')
 def home():
+    """
     cursor.execute(
             '''
             SELECT pg_get_serial_sequence('"Player"', 'id'); -- returns 'player_id_seq'
@@ -453,6 +454,7 @@ def home():
         '''
         )
     db.commit()
+    """
     schedule = showSchedule()
     return render_template("home.html", title='Home', schedules=schedule)
 
@@ -530,6 +532,19 @@ def update_game():
 
 @app.route('/insert_player', methods=['GET', 'POST'])
 def insert_player():
+    cursor.execute(
+            '''
+            SELECT pg_get_serial_sequence('"Player"', 'id'); -- returns 'player_id_seq'
+            '''
+    )
+    cursor.execute(
+        '''
+        -- reset the sequence, regardless whether table has rows or not:
+        SELECT setval(pg_get_serial_sequence('"Player"', 'id'), coalesce(max(id) + 1,1), false) FROM "Player";
+        '''
+        )
+    db.commit()
+
     if request.method == 'POST':
 
         firstname = request.form['firstname']
@@ -554,6 +569,19 @@ def insert_player():
 
 @app.route('/insert_stat', methods=['GET','POST'])
 def insert_stat():
+    cursor.execute(
+            '''
+            SELECT pg_get_serial_sequence('"StatInfo"', 'id'); 
+            '''
+    )
+    cursor.execute(
+        '''
+        -- reset the sequence, regardless whether table has rows or not:
+        SELECT setval(pg_get_serial_sequence('"StatInfo"', 'id'), coalesce(max(id) + 1,1), false) FROM "StatInfo";
+        '''
+        )
+    db.commit()
+
     if request.method == 'POST':
 
         firstname =request.form['firstname']
