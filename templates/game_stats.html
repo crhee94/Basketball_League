@@ -16,7 +16,7 @@
 
     <button>View</button>
 </form>
-{% if gameInfo != null %} 
+{% if gameInfo != null %}
 {% for info in gameInfo %}
 <p>{{info}}</p>
 {% endfor %}
@@ -24,46 +24,48 @@
 
 
 {% if totalPoints != null and totalRebounds != null and totalAssists != null %}
-<h2>{{totalPoints[0][0]}} - Points: {{totalPoints[0][1]}} - Rebounds: {{totalRebounds[0][1]}} - Assists: {{totalAssists[0][1]}}</h2>
-<h2>{{totalPoints[1][0]}} - Points: {{totalPoints[1][1]}} - Rebounds: {{totalRebounds[1][1]}} - Assists: {{totalAssists[1][1]}}</h2>
+<h2>{{totalPoints[0][0]}} - Points: {{totalPoints[0][1]}} - Rebounds: {{totalRebounds[0][1]}} - Assists:
+    {{totalAssists[0][1]}}</h2>
+<h2>{{totalPoints[1][0]}} - Points: {{totalPoints[1][1]}} - Rebounds: {{totalRebounds[1][1]}} - Assists:
+    {{totalAssists[1][1]}}</h2>
 
 <h2>Home Team</h2>
-<table class="customers" style="width:100%">
+<table border="1" class="customers" style="width:100%">
     <tr>
-      <th>First Name</th>
-      <th>Last Name</th>
-      <th>Team</th>
-      <th>Pts</th>
-      <th>Reb</th>
-      <th>Ast</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Team</th>
+        <th>Pts</th>
+        <th>Reb</th>
+        <th>Ast</th>
     </tr>
     {% for player in homeTeam %}
     <tr>
         {% for row in player %}
-            <td>{{row}}</td>
+        <td>{{row}}</td>
         {% endfor %}
     </tr>
-    {% endfor %}  
+    {% endfor %}
 </table>
 
 <h2>Away Team</h2>
-<table style="width:100%">
+<table border="1" style="width:100%">
     <tr>
-      <th>First Name</th>
-      <th>Last Name</th>
-      <th>Team</th>
-      <th>Pts</th>
-      <th>Reb</th>
-      <th>Ast</th>
-    </tr> 
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Team</th>
+        <th>Pts</th>
+        <th>Reb</th>
+        <th>Ast</th>
+    </tr>
 
     {% for player in awayTeam %}
     <tr>
         {% for row in player %}
-            <td>{{row}}</td>
+        <td>{{row}}</td>
         {% endfor %}
     </tr>
-    {% endfor %} 
+    {% endfor %}
 </table>
 {% endif %}
 {% endblock content %}
