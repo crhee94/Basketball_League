@@ -3,6 +3,32 @@
 <h1>Insert Stats</h1>
 
 <form action="/insert_stat" method="POST">
+
+    <select style="margin: 30px 0" name="game">
+        <option value="">Select Game</option>
+        <option value="game1">Game 1</option>
+        <option value="game2">Game 2</option>
+        <option value="game3">Game 3</option>
+        <option value="game4">Game 4</option>
+        <option value="game5">Game 5</option>
+        <option value="game6">Game 6</option>
+    </select>
+
+    <div class="form-group">
+        <label>First Name </label>
+        <input style="width: 100px" type="text" class="form-control" name="firstname" required="1">
+    </div>
+
+    <div class="form-group">
+        <label>Last Name </label>
+        <input style="width: 100px" type="text" class="form-control" name="lastname" required="1">
+    </div>
+
+    <div class="form-group">
+        <label>Team Name </label>
+        <input style="width: 100px" type="text" class="form-control" name="teamname" required="1">
+    </div>
+
     <div class="form-group">
         <label>Points:</label>
         <input style="width: 100px" type="number" class="form-control" name="points" required="1">

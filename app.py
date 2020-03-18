@@ -428,29 +428,33 @@ def insert_player():
 @app.route('/insert_stat', methods=['GET','POST'])
 def insert_stat():
     if request.method == 'POST':
+
+        firstname =request.form['firstname']
+        lastname =request.form['lastname']
+        teamname = request.form['teamname']
+        game = request.form['game']
         points = request.form['points']
         print(points)
         rebounds = request.form['rebounds']
-        print(rebounds)
         assists = request.form['assists']
-        print(assists)
+        
         cursor.execute(
             '''
             INSERT INTO "StatInfo"(PlayerID, GameID, Type, StatValue) 
-            VALUES (%s, %s)
-            ''', ('Pts', points))
+            VALUES ((SELECT "Player".Id FROM "Player" INNER JOIN "Team" ON ("Player".TeamId = "Team".Id) WHERE firstName = %s AND lastName = %s), %s, %s, %s)
+            ''', (firstname, lastname, game[4:],'Pts', points))
 
         cursor.execute(
             '''
             INSERT INTO "StatInfo"(PlayerID, GameID, Type, StatValue) 
-            VALUES (%s, %s)
-            ''', ('Reb', rebounds))
+            VALUES ((SELECT "Player".Id FROM "Player" INNER JOIN "Team" ON ("Player".TeamId = "Team".Id) WHERE firstName = %s AND lastName = %s), %s, %s, %s)
+            ''', (firstname, lastname, game[4:],'Reb', rebounds))
 
         cursor.execute(
             '''
             INSERT INTO "StatInfo"(PlayerID, GameID, Type, StatValue) 
-            VALUES (%s, %s)
-            ''', ('Ast', assists))
+            VALUES ((SELECT "Player".Id FROM "Player" INNER JOIN "Team" ON ("Player".TeamId = "Team".Id) WHERE firstName = %s AND lastName = %s), %s, %s, %s)
+            ''', (firstname, lastname, game[4:],'Ast', assists))
 
         db.commit()
     return render_template("insert_stat.html", title='Insert Stat')
